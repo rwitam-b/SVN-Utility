@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane minHeight="540.0" minWidth="960.0" prefHeight="230.0" prefWidth="544.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
+    <tabs>
+        <Tab text="Connect To Server">
+            <content>
+                <BorderPane prefHeight="200.0" prefWidth="200.0">
+                    <padding>
+                        <Insets bottom="12.0" left="24.0" right="24.0" top="12.0" />
+                    </padding>
+                    <center>
+                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="30.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <TextField fx:id="svnConnectURL" promptText="Enter Repository URL" />
+                                <TextField fx:id="svnConnectUser" promptText="Enter Username" />
+                                <PasswordField fx:id="svnConnectPassword" promptText="Enter Password" />
+                                <Button fx:id="svnConnectButton" mnemonicParsing="false" onAction="#svnConnectButtonClick" text="Connect" />
+                            </children>
+                            <padding>
+                                <Insets left="40.0" right="40.0" />
+                            </padding>
+                        </VBox>
+                    </center>
+                    <top>
+                        <Label fx:id="svnConnectMessage" text="Enter Credentials To Connect To SVN Repository" textAlignment="CENTER" wrapText="true" BorderPane.alignment="CENTER">
+                            <font>
+                                <Font size="18.0" />
+                            </font>
+                        </Label>
+                    </top>
+                </BorderPane>
+            </content>
+        </Tab>
+        <Tab fx:id="tabExportCheckout" disable="true" text="Export/Checkout : All">
+            <content>
+                <BorderPane prefHeight="200.0" prefWidth="200.0">
+                    <center>
+                        <TextArea fx:id="svnOutLog" editable="false" prefHeight="315.0" prefWidth="912.0" promptText="Processing Logs Will Be Shown Here" BorderPane.alignment="CENTER" />
+                    </center>
+                    <padding>
+                        <Insets bottom="12.0" left="24.0" right="24.0" top="12.0" />
+                    </padding>
+                    <top>
+                        <VBox prefHeight="120.0" prefWidth="912.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <HBox alignment="CENTER" prefHeight="60.0" prefWidth="598.0" spacing="20.0">
+                                    <children>
+                                        <TextField fx:id="svnOutDestPath" alignment="CENTER" prefHeight="25.0" prefWidth="597.0" promptText="Enter Destination Path" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER" prefHeight="60.0" prefWidth="598.0" spacing="20.0">
+                                    <children>
+                                        <ChoiceBox fx:id="svnOutType" prefHeight="25.0" prefWidth="103.0" HBox.hgrow="ALWAYS" />
+                                        <Label fx:id="svnOutDepthLabel" text="Checkout Depth" textAlignment="CENTER" wrapText="true" />
+                                        <ChoiceBox fx:id="svnOutDepth" prefWidth="150.0" />
+                                        <Button fx:id="svnOutButton" mnemonicParsing="false" onAction="#svnOutButtonClick" text="Checkout" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </top>
+                </BorderPane>
+            </content>
+        </Tab>
+        <Tab fx:id="tabExportCheckout2" disable="true" text="Export/Checkout : Reference">
+            <content>
+                <BorderPane prefHeight="200.0" prefWidth="200.0">
+                    <center>
+                        <TextArea fx:id="svnOutSpecLog" editable="false" prefHeight="324.0" prefWidth="912.0" promptText="Processing Logs Will Be Displayed Here" BorderPane.alignment="CENTER" />
+                    </center>
+                    <padding>
+                        <Insets bottom="12.0" left="24.0" right="24.0" top="12.0" />
+                    </padding>
+                    <top>
+                        <VBox prefHeight="176.0" prefWidth="912.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <HBox alignment="CENTER" prefHeight="50.0" prefWidth="912.0" spacing="20.0">
+                                    <children>
+                                        <TextField fx:id="svnOutSpecPath" prefHeight="25.0" prefWidth="594.0" promptText="Enter Source Path (Same Directory Level The SVN Server Is Pointing To)" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="53.0" prefWidth="912.0" spacing="20.0">
+                                    <children>
+                                        <TextField fx:id="svnOutSpecWD" prefHeight="25.0" prefWidth="594.0" promptText="Enter Destination Path" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER" prefHeight="53.0" prefWidth="912.0" spacing="20.0">
+                                    <children>                              
+                              <VBox alignment="CENTER" prefHeight="69.0" prefWidth="150.0" spacing="10.0">
+                                 <children>
+                                              <TextField fx:id="svnOutSpecExtensions" promptText="Extension Filters" />
+                                    <ToggleButton fx:id="svnOutSpecExtensionsToggle" disable="true" mnemonicParsing="false" selected="true" style="-fx-background-color: #D3D3D3;" text="No Filters!" wrapText="true" />
+                                 </children>
+                              </VBox>
+                                        <ChoiceBox fx:id="svnOutSpecType" prefHeight="25.0" prefWidth="103.0" HBox.hgrow="ALWAYS" />
+                                        <Button fx:id="svnOutSpecButton" mnemonicParsing="false" onAction="#svnOutSpecButtonClick" text="Checkout" wrapText="true" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </top>
+                </BorderPane>
+            </content>
+        </Tab>
+      <Tab fx:id="tabExportCheckout3" disable="true" text="Export/Checkout : Links">
+         <content>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <center>
+                  <TextArea fx:id="svnOutLinkLog" editable="false" prefHeight="315.0" prefWidth="912.0" promptText="Processing Logs Will Be Displayed Here" BorderPane.alignment="CENTER" />
+               </center>
+               <padding>
+                  <Insets bottom="12.0" left="24.0" right="24.0" top="12.0" />
+               </padding>
+               <top>
+                  <VBox prefHeight="184.0" prefWidth="912.0" spacing="10.0">
+                     <children>
+                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <TextArea fx:id="svnOutLinkPath" prefHeight="93.0" prefWidth="947.0" promptText="Enter File URLs To Process, Each Line Should Contain Only One File" wrapText="true" />
+                           </children>
+                           <BorderPane.margin>
+                              <Insets bottom="12.0" />
+                           </BorderPane.margin>
+                        </HBox>
+                        <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="200.0" spacing="10.0">
+                           <children>
+                              <TextField fx:id="svnOutLinkDest" prefHeight="25.0" prefWidth="132.0" promptText="Enter Destination Path (Same Directory Level The SVN Server Is Pointing To)" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="TOP_CENTER" prefHeight="57.0" prefWidth="912.0" spacing="10.0">
+                           <children>
+                              <ChoiceBox fx:id="svnOutLinkType" prefHeight="25.0" prefWidth="103.0" />
+                              <Button fx:id="svnOutLinkButton" mnemonicParsing="false" onAction="#svnOutLinkButtonClick" text="Checkout" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </top>
+            </BorderPane>
+         </content>
+      </Tab>
+        <Tab fx:id="tabSearch" disable="true" text="Search">
+            <content>
+                <BorderPane prefHeight="200.0" prefWidth="200.0">
+                    <center>
+                        <TextArea fx:id="svnSearchLog" editable="false" prefHeight="315.0" prefWidth="912.0" promptText="Search Results Will Be Shown Here" BorderPane.alignment="CENTER" />
+                    </center>
+                    <padding>
+                        <Insets bottom="12.0" left="24.0" right="24.0" top="12.0" />
+                    </padding>
+                    <top>
+                        <VBox>
+                            <children>
+                                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
+                                    <children>
+                                        <TextArea fx:id="svnSearchList" prefHeight="128.0" prefWidth="840.0" promptText="Enter Filename(s)/Path(s) To Search, Each Line Should Contain Only One File" wrapText="true" />
+                                        <Button fx:id="svnSearchButton" mnemonicParsing="false" onAction="#svnSearchButtonClick" text="Search" />
+                                    </children>
+                                    <BorderPane.margin>
+                                        <Insets bottom="12.0" />
+                                    </BorderPane.margin>
+                                </HBox>
+                                <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="200.0" spacing="10.0">
+                                    <children>
+                                        <TextField fx:id="svnSearchDest" prefHeight="25.0" prefWidth="596.0" promptText="Enter Destination Folder Path" HBox.hgrow="ALWAYS" />
+                                        <CheckBox fx:id="svnSearchCopy" mnemonicParsing="false" text="Copy Files To Destination Folder" wrapText="true" />
+                                    </children>
+                                    <padding>
+                                        <Insets left="10.0" right="10.0" />
+                                    </padding>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </top>
+                </BorderPane>
+            </content>
+        </Tab>
+        <Tab fx:id="tabHelp" text="Help">
+            <content>
+                <BorderPane prefHeight="200.0" prefWidth="200.0">
+                    <center>
+                        <Accordion BorderPane.alignment="CENTER">
+                            <panes>
+                                <TitledPane text="Connect To Server" wrapText="true">
+                                    <content>
+                                        <TextArea editable="false" prefHeight="200.0" prefWidth="200.0" text="You need to connect to the SVN Repository before performing any operations!&#10;&#10;Usage -&gt;&#10;        Step 1: Provide the repository path&#10;        Step 2: Provide access credentials if required&#10;        Step 3: Click on connect" wrapText="true" />
+                                    </content>
+                                </TitledPane>
+                                <TitledPane expanded="false" text="Export/Checkout : All" wrapText="true">
+                                    <content>
+                                        <TextArea prefHeight="200.0" prefWidth="200.0" text="Use this operation to perform a bulk export/checkout under the path you have connected to. This operation will process all files and folders it finds &quot;inside&quot; the repository link it is connected to.&#10;&#9;&#10;Usage -&gt;&#10;        Step 1: Enter the destination path where you want your files&#10;        Step 2: Choose between &quot;Export&quot; or &quot;Checkout&quot;&#10;        Step 3: Choose the depth of the checkout -&gt;&#10;                    - Empty : Include only the immediate target of the operation, not any of its file or directory children&#10;                    - Files : Include the immediate target of the operation and any of its immediate file children&#10;                    - Immediates : Include the immediate target of the operation and any of its immediate file or directory. The directory children will themselves be empty&#10;                    - Infinity : Include the immediate target, its file and directory children, its children's children, and so on to full recursion&#10;&#9;Step 4: Click on &quot;Export&quot; or &quot;Checkout&quot; button, as displayed per operation&#10;&#9;Step 5: Check output logs below for subsequent information" wrapText="true" />
+                                    </content>
+                                </TitledPane>
+                                <TitledPane expanded="false" text="Export/Checkout : Reference" wrapText="true">
+                                    <content>
+                                        <TextArea prefHeight="200.0" prefWidth="200.0" text="Use this operation to perform a referential export/checkout with respect to the file structure present in the source path. Make sure the source path, and the repository connection link is at the same level in the file structure.&#10;&#9;&#10;Usage -&gt;&#10;        Step 1: Enter the source path where you have your reference files&#10;        Step 2: Enter the destination path where you want your files checked out from repository&#10;        Step 3: Enter extension filters, if you want to process only certain types of files&#10;        Step 4: Choose between &quot;Export&quot; or &quot;Checkout&quot;        &#10;&#9;Step 5: Click on &quot;Process Files&quot;&#10;&#9;Step 6: Check output logs below for subsequent information" wrapText="true" />
+                                    </content>
+                                </TitledPane>
+                        <TitledPane expanded="false" layoutX="10.0" layoutY="60.0" text="Export/Checkout : Links" wrapText="true">
+                           <content>
+                              <TextArea prefHeight="200.0" prefWidth="200.0" text="Use this operation to perform export/checkout using the direct file links from the repository. Make sure the destination path, and the repository connection link is at the same level in the file structure.&#10;&#9;&#10;Usage -&gt;&#10;        Step 1: Enter the file links in the source path&#10;        Step 2: Enter the destination path where you want your files placed    &#10;        Step 3: Choose between &quot;Export&quot; or &quot;Checkout&quot;&#10;&#9;Step 4: Check output logs below for subsequent information" wrapText="true" />
+                           </content>
+                        </TitledPane>
+                                <TitledPane expanded="false" prefHeight="200.0" prefWidth="200.0" text="Search" wrapText="true">
+                                    <content>
+                                        <TextArea prefHeight="200.0" prefWidth="200.0" text="Use this operation to search for files in the repository. You can also arrange the files in your local system as per the structure present in the repository!&#10;&#9;&#10;Usage -&gt;&#10;        Step 1: Enter the source file list which you want to search (in case you want to arrange them as well, make sure the files are present in the path provided)&#10;        Step 2: Enter the destination path where you want your search logs written/files copied to&#10;        Step 3: Check/Uncheck &quot;Copy Files To Destination Folder&quot;. This option is for copying the source files to the destination path, in the structure found in the repository&#10;&#9;Step 5: Click on &quot;Search&quot;&#10;&#9;Step 6: Check output logs below for subsequent information" wrapText="true" />
+                                    </content>
+                                </TitledPane>
+                            </panes>
+                            <BorderPane.margin>
+                                <Insets />
+                            </BorderPane.margin>
+                        </Accordion>
+                    </center>
+                    <padding>
+                        <Insets bottom="12.0" left="24.0" right="24.0" top="12.0" />
+                    </padding>
+                    <bottom>
+                        <HBox alignment="BOTTOM_RIGHT" prefHeight="29.0" prefWidth="912.0" spacing="2.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <Label text="Made With" />
+                                <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="/Heart.png" />
+                                    </image>
+                                </ImageView>
+                                <Label text="By Rwitam" />
+                            </children>
+                        </HBox>
+                    </bottom>
+                </BorderPane>
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>
