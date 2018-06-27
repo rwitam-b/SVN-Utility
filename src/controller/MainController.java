@@ -5,8 +5,6 @@ import common.SVNOperations;
 import common.ScreenValidations;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -20,10 +18,12 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.paint.Paint;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -50,6 +50,8 @@ public class MainController implements Initializable {
     Tab tabExportCheckout, tabExportCheckout2, tabExportCheckout3, tabSearch;
     @FXML
     ToggleButton svnOutSpecExtensionsToggle;
+    @FXML
+    RadioButton svnSearchType1, svnSearchType2, svnSearchType3;
 
     private void clearTextArea(TextArea subject) {
         subject.clear();
@@ -215,6 +217,9 @@ public class MainController implements Initializable {
                 svnSearchLog.appendText("This Typically Takes 5-10 Minutes, Depending On The Repository Size!");
                 svnSearchCopy.setDisable(true);
                 svnSearchDest.setDisable(true);
+                svnSearchType1.setDisable(true);
+                svnSearchType2.setDisable(true);
+                svnSearchType3.setDisable(true);
             });
 
             listingService.setOnSucceeded(e -> {
@@ -223,6 +228,9 @@ public class MainController implements Initializable {
                     svnSearchButton.setDisable(false);
                     svnSearchCopy.setDisable(false);
                     svnSearchDest.setDisable(false);
+                    svnSearchType1.setDisable(false);
+                    svnSearchType2.setDisable(false);
+                    svnSearchType3.setDisable(false);
                     clearTextArea(svnSearchLog);
                 } else {
                     svnSearchLog.setText("Failed To Construct File Index For The Repository!");
@@ -404,7 +412,7 @@ public class MainController implements Initializable {
                         @Override
                         protected Void call() {
                             try {
-                                SVNCheckout checkoutSpec = new SVNCheckout(svnOutSpecLog);
+                                SVNCheckout checkoutSpec = new SVNCheckout(svnOutLinkLog);
                                 checkoutSpec.doCheckout(type, destinationPath, fileLinks);
                                 Platform.runLater(() -> {
                                     svnOutLinkLog.appendText(FileOperations.NEWLINE + FileOperations.NEWLINE + "Done Processing All Files!" + FileOperations.NEWLINE);
@@ -448,6 +456,12 @@ public class MainController implements Initializable {
             String[] files = svnSearchList.getText().trim().split("\\R+");
             boolean copyFiles = svnSearchCopy.isSelected();
             String copyPath = svnSearchDest.getText().trim();
+            boolean match1 = svnSearchType1.isSelected();
+            boolean match2 = svnSearchType2.isSelected();
+            boolean match3 = svnSearchType3.isSelected();
+
+            // Getting type of search from screen inputs
+            String searchType = match1 ? "SPECIFIC" : match2 ? "FILENAME" : match3 ? "CONTAINS" : "SPECIFIC";
 
             // Validations for input
             try {
@@ -470,7 +484,7 @@ public class MainController implements Initializable {
                         @Override
                         protected Void call() {
                             try {
-                                SVNSearch search = new SVNSearch(svnSearchLog);
+                                SVNSearch search = new SVNSearch(svnSearchLog, searchType);
                                 search.execute(copyPath, files, copyFiles);
                                 Platform.runLater(() -> {
                                     svnSearchLog.appendText(FileOperations.NEWLINE + FileOperations.NEWLINE + "Done Processing All Files!" + FileOperations.NEWLINE);
@@ -491,6 +505,9 @@ public class MainController implements Initializable {
                 svnSearchButton.setDisable(true);
                 svnSearchDest.setDisable(true);
                 svnSearchCopy.setDisable(true);
+                svnSearchType1.setDisable(true);
+                svnSearchType2.setDisable(true);
+                svnSearchType3.setDisable(true);
             });
 
             service.setOnSucceeded(e -> {
@@ -498,6 +515,9 @@ public class MainController implements Initializable {
                 svnSearchButton.setDisable(false);
                 svnSearchDest.setDisable(false);
                 svnSearchCopy.setDisable(false);
+                svnSearchType1.setDisable(false);
+                svnSearchType2.setDisable(false);
+                svnSearchType3.setDisable(false);
             });
 
             service.start();
@@ -557,6 +577,20 @@ public class MainController implements Initializable {
         svnOutLinkType.setValue("Checkout");
         svnOutLinkType.setOnAction((event) -> {
             svnOutLinkButton.setText(svnOutLinkType.getValue().toString());
+        });
+
+        // "Search" Initializations
+        // Binding the Sort Order radio buttons to a single group for toggling
+        final ToggleGroup group = new ToggleGroup();
+        svnSearchType1.setToggleGroup(group);
+        svnSearchType2.setToggleGroup(group);
+        svnSearchType3.setToggleGroup(group);
+        svnSearchCopy.setOnAction(event -> {
+            if (svnSearchCopy.isSelected()) {
+                svnSearchButton.setText("Search & Arrange");
+            } else {
+                svnSearchButton.setText("Search");
+            }
         });
     }
 }

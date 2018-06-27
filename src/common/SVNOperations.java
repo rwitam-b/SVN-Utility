@@ -48,6 +48,10 @@ public class SVNOperations {
         return repoLink;
     }
 
+    public static long getHeadRevision() {
+        return latestRevision;
+    }
+
     public static void listFiles(String path) throws SVNException {
         if (!isAuthenticated()) {
             throw new SVNAuthenticationException(SVNErrorMessage.create(SVNErrorCode.AUTHN_CREDS_UNAVAILABLE, "SVN Authentication Failure!"));
@@ -56,17 +60,17 @@ public class SVNOperations {
         Iterator iterator = entries.iterator();
         while (iterator.hasNext()) {
             SVNDirEntry entry = (SVNDirEntry) iterator.next();
-            
-            String fullName = FilenameUtils.getBaseName(entry.getName().toLowerCase());
+            String fullName = entry.getName().toLowerCase();
+            String baseName = FilenameUtils.getBaseName(entry.getName().toLowerCase());
             if (entry.getKind() == SVNNodeKind.FILE) {
                 String ext = FileOperations.getExtension(entry.getName());
                 if (!files.containsKey(ext)) {
                     files.put(ext, new HashMap());
                 }
-                if (!files.get(ext).containsKey(fullName)) {
-                    files.get(ext).put(fullName, new ArrayList());
+                if (!files.get(ext).containsKey(baseName)) {
+                    files.get(ext).put(baseName, new ArrayList());
                 }
-                files.get(ext).get(fullName).add("/" + (path.equals("") ? "" : path + "/") + entry.getName());
+                files.get(ext).get(baseName).add("/" + (path.equals("") ? "" : path + "/") + entry.getName());
             } else if (entry.getKind() == SVNNodeKind.DIR) {
                 if (!files.containsKey("FOLDER")) {
                     files.put("FOLDER", new HashMap());
@@ -80,6 +84,41 @@ public class SVNOperations {
         }
     }
 
+    public static HashMap<String, ArrayList<String>> searchFiles(ArrayList<String> filenames) throws SVNException, Exception {
+        if (!isAuthenticated()) {
+            throw new SVNAuthenticationException(SVNErrorMessage.create(SVNErrorCode.AUTHN_CREDS_UNAVAILABLE, "SVN Authentication Failure!"));
+        }
+        if (files == null) {
+            throw new Exception("File Index Not Built!");
+        }
+        HashMap<String, ArrayList<String>> results = new HashMap();
+
+        // Searching filenames containing "input filenames", using painfully expensive O(input files*extensions*files of each extension) complexity
+        filenames.forEach((file) -> {
+            // Iterating through each file
+            String fullname = file.toLowerCase();
+            String baseName = FilenameUtils.getBaseName(fullname);
+            for (Entry<String, HashMap<String, ArrayList<String>>> entry : files.entrySet()) {
+                // Iterating through each extension type
+                String extension = entry.getKey();
+                HashMap<String, ArrayList<String>> fileBucket = entry.getValue();
+                for (Entry<String, ArrayList<String>> entry2 : fileBucket.entrySet()) {
+                    // Iterating through each file in the specified extension's file bucket
+                    String serverFilename = entry2.getKey() + extension;
+                    ArrayList<String> locations = entry2.getValue();
+                    if (serverFilename.contains(fullname)) {
+                        if (!results.containsKey(file)) {
+                            results.put(file, new ArrayList());
+                        }
+                        results.get(file).addAll(locations);
+                    }
+                }
+            }
+        });
+
+        return results;
+    }
+
     public static HashMap<String, ArrayList<String>> searchFiles(ArrayList<String> filenames, boolean ignoreExtensions) throws SVNException, Exception {
         if (!isAuthenticated()) {
             throw new SVNAuthenticationException(SVNErrorMessage.create(SVNErrorCode.AUTHN_CREDS_UNAVAILABLE, "SVN Authentication Failure!"));
@@ -87,33 +126,40 @@ public class SVNOperations {
         if (files == null) {
             throw new Exception("File Index Not Built!");
         }
-
         HashMap<String, ArrayList<String>> results = new HashMap();
 
-        filenames.forEach((file) -> {
-            String fullname = file.toLowerCase();
-            String baseName = FilenameUtils.getBaseName(fullname);
-            // Checking indexed SVN repository for the files
-            for (Entry<String, HashMap<String, ArrayList<String>>> entry : files.entrySet()) {
-                String extension = entry.getKey();
-                HashMap<String, ArrayList<String>> fileBucket = entry.getValue();
-                if (ignoreExtensions) {
+        if (ignoreExtensions) {
+            // Do a full index search
+            filenames.forEach((file) -> {
+                String fullname = file.toLowerCase();
+                String baseName = FilenameUtils.getBaseName(fullname);
+                for (Entry<String, HashMap<String, ArrayList<String>>> entry : files.entrySet()) {
+                    HashMap<String, ArrayList<String>> fileBucket = entry.getValue();
+                    if (fileBucket.containsKey(baseName)) {
+                        if (!results.containsKey(file)) {
+                            results.put(file, new ArrayList());
+                        }
+                        results.get(file).addAll(fileBucket.get(baseName));
+                    }
+                }
+            });
+        } else {
+            // Consider only the files having the same extensions as the parent file
+            filenames.forEach((file) -> {
+                String fullName = file.toLowerCase();
+                String extension = FileOperations.getExtension(fullName);
+                String baseName = FilenameUtils.getBaseName(fullName);
+                if (files.containsKey(extension)) {
+                    HashMap<String, ArrayList<String>> fileBucket = files.get(extension);
                     if (fileBucket.containsKey(baseName)) {
                         if (!results.containsKey(file)) {
                             results.put(file, new ArrayList());
                         }
                         results.get(file).addAll(files.get(extension).get(baseName));
                     }
-                } else {
-                    if (fileBucket.containsKey(fullname)) {
-                        if (!results.containsKey(file)) {
-                            results.put(file, new ArrayList());
-                        }
-                        results.get(file).addAll(files.get(extension).get(fullname));
-                    }
                 }
-            }
-        });
+            });
+        }
         return results;
     }
 

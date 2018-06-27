@@ -15,12 +15,14 @@ import org.tmatesoft.svn.core.SVNException;
 public class SVNSearch {
 
     private TextArea outputLogs;
+    private String searchType;
 
-    public SVNSearch(TextArea outputLogs) throws Exception {
+    public SVNSearch(TextArea outputLogs, String searchType) throws Exception {
         if (!SVNOperations.isAuthenticated()) {
             throw new Exception("SVN Authentication Failure!");
         }
         this.outputLogs = outputLogs;
+        this.searchType = searchType;
     }
 
     public void execute(String copyPath, String[] files, boolean copyFiles) throws Exception {
@@ -48,6 +50,10 @@ public class SVNSearch {
                 }
             }
 
+            if (filenames.isEmpty()) {
+                throw new Exception("No files to search!");
+            }
+
             // Preparing log files
             Date D = new Date();
             String logFile = new SimpleDateFormat("'search_'yyyy_MM_dd_HH_mm'.txt'").format(D);
@@ -64,7 +70,13 @@ public class SVNSearch {
                 outputLogs.appendText("Searching For Files....." + FileOperations.NEWLINE);
             });
 
-            HashMap<String, ArrayList<String>> found = SVNOperations.searchFiles(filenames, true);
+            HashMap<String, ArrayList<String>> found = null;
+            // Calling search methods based on "searchType"
+            if (searchType.equals("SPECIFIC") || searchType.equals("FILENAME")) {
+                found = SVNOperations.searchFiles(filenames, searchType.equals("FILENAME"));
+            } else if (searchType.equals("CONTAINS")) {
+                found = SVNOperations.searchFiles(filenames);
+            }
 
             Platform.runLater(() -> {
                 outputLogs.appendText(FileOperations.NEWLINE + "Processing....." + FileOperations.NEWLINE);
@@ -116,10 +128,8 @@ public class SVNSearch {
                     FileUtils.writeLines(skip, "UTF-8", skipped, FileOperations.NEWLINE, false);
                 }
             } else {
-                filenames.stream().map((filename) -> {
+                for (String filename : filenames) {
                     logs.add(filename);
-                    return filename;
-                }).map((filename) -> {
                     if (found.containsKey(filename)) {
                         found.get(filename).forEach((path) -> {
                             logs.add(SVNOperations.getRepositoryPath() + path);
@@ -129,10 +139,8 @@ public class SVNSearch {
                     } else {
                         logs.add("Not Found!");
                     }
-                    return filename;
-                }).forEachOrdered((_item) -> {
                     logs.add(FileOperations.NEWLINE);
-                });
+                }
             }
 
             Platform.runLater(() -> {

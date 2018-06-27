@@ -1,5 +1,6 @@
 package controller;
 
+import common.SVNOperations;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,11 +23,19 @@ public class SVNUtility extends Application {
             stage.setMinHeight(540);
             stage.setMinWidth(960);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Unable To Start Application!");
         }
     }
 
     public static void main(String[] args) {
         Application.launch(args);
+    }
+
+    @Override
+    public void stop() {
+        try {
+            SVNOperations.destroySession();
+        } catch (Exception e) {
+        }
     }
 }

@@ -4,7 +4,6 @@ import common.FileOperations;
 import common.SVNOperations;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -158,7 +157,7 @@ public class SVNCheckout {
         try {
             // Checkout/Export With Links Option
             Platform.runLater(() -> {
-                outputLogs.appendText("Processing files" + FileOperations.NEWLINE + FileOperations.NEWLINE);
+                outputLogs.appendText("Processing Files" + FileOperations.NEWLINE + FileOperations.NEWLINE);
             });
             if (type.toLowerCase().equals("checkout")) {
                 SVNOperations.checkout(workingDirectory, SVNDepth.EMPTY);
